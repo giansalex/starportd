@@ -19,7 +19,7 @@ ENV PATH=$PATH:/go/bin
 # INSTALL DEPENDENCIES
 RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
 	apk update && apk add --no-cache \
-	go \
+	go@community \
 	npm \ 
 	make \
 	git \
