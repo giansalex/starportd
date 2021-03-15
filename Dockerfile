@@ -41,14 +41,12 @@ RUN PATH=$PATH:/go/bin && \
 
 
 # Install proto
-RUN /usr/bin/protoc /usr/local/bin && \
-	wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip \
-    -O /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
+RUN wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip -O /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     unzip /protoc-${PROTOC_VERSION}-linux-x86_64.zip -d /usr/local/ && \
     rm -f /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
-	git clone --depth=1 https://github.com/googleapis/googleapis.git && \
-	cp -r googleapis/google/api /usr/local/include/ && \
-	rm -rf ./googleapis
+    git clone --depth=1 https://github.com/googleapis/googleapis.git && \
+    cp -r googleapis/google/api /usr/local/include/google/ && \
+    rm -rf ./googleapis
 
 WORKDIR /app
 
