@@ -4,6 +4,7 @@ LABEL owner="Giancarlos Salas"
 LABEL maintainer="me@giansalex.dev"
 
 ARG STARPORT_VERSION='develop'
+ARG PROTOC_VERSION='3.15.6'
 
 # EXPOSE PORTS
 EXPOSE 12345
@@ -20,6 +21,7 @@ ENV PATH=$PATH:/go/bin
 RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
 	apk update && apk add --no-cache \
 	go@community \
+	wget \
 	npm \ 
 	make \
 	git \
@@ -29,19 +31,24 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
 
 # Clone starport code
 RUN mkdir /go && \
-    mkdir /usr/local/include && \
     git clone https://github.com/tendermint/starport.git /starport && \
     cd /starport && git checkout ${STARPORT_VERSION}
 
-WORKDIR /starport
-
 # INSTALL STARPORT
 RUN PATH=$PATH:/go/bin && \
-		bash scripts/install && \
-        /bin/protoc /usr/local/bin
+		cd /starport && make install && \
+		cd / && rm -rf /starport
 
-# Copy third_party proto
-COPY include/ /usr/local/include/
+
+# Install proto
+RUN /usr/bin/protoc /usr/local/bin && \
+	wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip \
+    -O /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
+    unzip /protoc-${PROTOC_VERSION}-linux-x86_64.zip -d /usr/local/ && \
+    rm -f /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
+	git clone --depth=1 https://github.com/googleapis/googleapis.git && \
+	cp -r googleapis/google/api /usr/local/include/ && \
+	rm -rf ./googleapis
 
 WORKDIR /app
 
