@@ -1,17 +1,7 @@
-FROM alpine
+FROM alpine as base
 
 LABEL owner="Giancarlos Salas"
 LABEL maintainer="me@giansalex.dev"
-
-ARG STARPORT_VERSION='develop'
-ARG PROTOC_VERSION='3.15.6'
-
-# EXPOSE PORTS
-EXPOSE 12345
-EXPOSE 8080
-EXPOSE 1317
-EXPOSE 26656
-EXPOSE 26657
 
 # GOPATH AND GOBIN ON PATH
 ENV GOPATH=/go
@@ -27,27 +17,41 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
 	git \
 	bash \
 	which \
-	protoc
+	protoc && \
+	mkdir /go 
+
+FROM base as builder
+
+ARG STARPORT_VERSION='develop'
+ARG PROTOC_VERSION='3.15.6'
 
 # Clone starport code
-RUN mkdir /go && \
-    git clone https://github.com/tendermint/starport.git /starport && \
+RUN git clone https://github.com/tendermint/starport.git /starport && \
     cd /starport && git checkout ${STARPORT_VERSION}
 
 # INSTALL STARPORT
-RUN PATH=$PATH:/go/bin && \
-		cd /starport && make install && \
-		cd / && rm -rf /starport
-
+RUN PATH=$PATH:/go/bin && cd /starport && make install
 
 # Install proto
 RUN wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip -O /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     unzip /protoc-${PROTOC_VERSION}-linux-x86_64.zip -d /usr/local/ && \
     rm -f /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     git clone --depth=1 https://github.com/googleapis/googleapis.git && \
-    cp -r googleapis/google/api /usr/local/include/google/ && \
-    rm -rf ./googleapis
+    cp -r googleapis/google/api /usr/local/include/google/
+
+FROM base
+
+# EXPOSE PORTS
+EXPOSE 12345
+EXPOSE 8080
+EXPOSE 1317
+EXPOSE 26656
+EXPOSE 26657
 
 WORKDIR /app
 
-CMD ["/go/bin/starport"]
+COPY --from=builder /usr/local/include /usr/local/
+COPY --from=builder /usr/local/bin/protoc /usr/local/bin/
+COPY --from=builder /go/bin/starport /usr/local/bin/
+
+CMD ["/usr/local/bin/starport"]
