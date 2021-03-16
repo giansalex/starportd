@@ -11,7 +11,6 @@ ENV PATH=$PATH:/go/bin
 RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
 	apk update && apk add --no-cache \
 	go@community \
-	wget \
 	npm \ 
 	make \
 	git \
@@ -24,6 +23,8 @@ FROM base as builder
 
 ARG STARPORT_VERSION='develop'
 ARG PROTOC_VERSION='3.15.6'
+
+RUN apk add --no-cache wget
 
 # Clone starport code
 RUN git clone https://github.com/tendermint/starport.git /starport && \
