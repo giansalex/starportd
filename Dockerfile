@@ -17,7 +17,7 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
 	bash \
 	which \
 	protoc && \
-	mkdir /go 
+	mkdir /go && mkdir /usr/local/include
 
 FROM base as builder
 
@@ -51,7 +51,7 @@ EXPOSE 26657
 
 WORKDIR /app
 
-COPY --from=builder /usr/local/include /usr/local/
+COPY --from=builder /usr/local/include/ /usr/local/include/
 COPY --from=builder /usr/bin/protoc /usr/local/bin/
 COPY --from=builder /go/bin/starport /usr/local/bin/
 
