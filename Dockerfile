@@ -22,7 +22,7 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
 FROM base as builder
 
 ARG STARPORT_VERSION='develop'
-ARG PROTOC_VERSION='3.17.0'
+ARG PROTOC_VERSION='3.17.3'
 
 RUN apk add --no-cache wget
 
