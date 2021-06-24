@@ -1,4 +1,4 @@
-FROM alpine as base
+FROM alpine:3.13.4 as base
 
 LABEL owner="Giancarlos Salas"
 LABEL maintainer="me@giansalex.dev"
