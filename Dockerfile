@@ -21,8 +21,8 @@ RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /et
 
 FROM base as builder
 
-ARG STARPORT_VERSION='develop'
-ARG PROTOC_VERSION='3.17.3'
+ARG STARPORT_VERSION='master'
+ARG PROTOC_VERSION='3.19.1'
 
 RUN apk add --no-cache wget
 
@@ -34,7 +34,7 @@ RUN git clone https://github.com/tendermint/starport.git /starport && \
 RUN PATH=$PATH:/go/bin && cd /starport && make install
 
 # Install proto
-RUN wget https://github.com/google/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip -O /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
+RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip -O /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     unzip /protoc-${PROTOC_VERSION}-linux-x86_64.zip -d /usr/local/ && \
     rm -f /protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     git clone --depth=1 https://github.com/googleapis/googleapis.git && \
